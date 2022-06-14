@@ -1,3 +1,4 @@
+from fileinput import filename
 import numpy as np
 from keyGeneration import *
 import random
@@ -9,20 +10,42 @@ import generator.originalSbox
 import generator.sbox
 import tkinter as tk
 from PIL import Image, ImageTk
+from tkinter import filedialog
+from tkinter.filedialog import askopenfile
 
 root = tk.Tk()
 
-img = Image.open('balloon.png')
-img = img.resize((300, 200))
-img = ImageTk.PhotoImage(img)
-img_label = tk.Label(image=img)
-img_label.image = img
-img_label.grid(column=1, row=0)
-instr = tk.Label(
-    root, text="Click on 'Encrypt' to encrypt the above image", font=("Raleway", 13))
-instr.grid(columnspan=3, column=0, row=1)
+
+def chooseFile():
+    global img
+    f_types = [('PNG Files', '*.png')]
+    global filename
+    filename = filedialog.askopenfilename(filetypes=f_types)
+    img = Image.open(filename)
+    img = img.resize((300, 200))
+    img = ImageTk.PhotoImage(img)
+    img_label = tk.Label(image=img)
+    img_label.image = img
+    img_label.grid(column=1, row=1)
+
+    # b2 = tk.Button(root, image=img)  # using Button
+    # b2.grid(row=3, column=1)
+    enc_btn = tk.Button(root, textvariable=button_text, command=lambda: encrypt(),
+                        font=("Raleway", 13), bg="#000000", fg="white", height=2, width=12)
+    button_text.set("Encrypt")
+    enc_btn.grid(column=1, row=2)
+
+
 
 button_text = tk.StringVar()
+
+
+send_btn_text = tk.StringVar()
+
+send_btn = tk.Button(root, textvariable=send_btn_text, command=lambda: chooseFile(),
+                     font=("Raleway", 13), bg="#000000", fg="white", height=2, width=12)
+send_btn_text.set("Send")
+send_btn.grid(column=1, row=0)
 
 
 def encrypt():
@@ -48,7 +71,7 @@ def encrypt():
             xorArr.append(op1[i] ^ op2[i])
         return xorArr
 
-    image = Image.open('balloon.png')
+    image = Image.open(filename)
     numpydata = asarray(image)
 
     try:
@@ -192,11 +215,6 @@ def encrypt():
     img_label2.image = img2
     img_label2.grid(column=1, row=4)
 
-
-enc_btn = tk.Button(root, textvariable=button_text, command=lambda: encrypt(),
-                    font=("Raleway", 13), bg="#000000", fg="white", height=2, width=12)
-button_text.set("Encrypt")
-enc_btn.grid(column=1, row=2)
 
 canvas = tk.Canvas(root, width=600, height=300)
 canvas.grid(columnspan=3, rowspan=3)
